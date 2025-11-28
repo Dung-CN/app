@@ -1,11 +1,24 @@
 from tkinter import*
 from Database import *
+from cryptography.fernet import Fernet
 import tkinter as tk
 import Signup
 import Forget_password
 import Interface
 import json, os
 
+# ================================ LOAD FERNET KEY ================================
+def load_key():
+    with open("secret.key", "rb") as f:
+        return f.read()
+
+fernet = Fernet(load_key())
+# =============================== HASH PASSWORD ===============================
+def hash_password(password):                 # Mã hóa
+    return fernet.encrypt(password.encode()).decode()
+
+def decrypt_password(enc_password):          # Giải mã
+    return fernet.decrypt(enc_password.encode()).decode()
 # =============================== JSON PROCESSING ===============================
 def load_users():
     if os.path.exists(USERS_FILE):
@@ -56,7 +69,7 @@ users = load_users()
 for username, info in users.items():
     if info.get("remember", False):
         username_email_entry.insert(0, username)
-        password_entry.insert(0, info.get("password", ""))
+        password_entry.insert(0, decrypt_password(info.get("password", "")))
         is_checked.set(True)
         break
 # ==== Login ====
@@ -66,9 +79,10 @@ def login_acc():
     users = load_users()
     login_user = None
     for username, info in users.items():
-        if ((username_input == username or username_input == info['email']) and (password_input == info['password'])):
-            login_user = username
-            break
+        if ((username_input == username or username_input == info['email'])):
+            if (password_input, decrypt_password(info.get('password', ''))):
+                login_user = username
+                break
     if login_user:
         msg_lbl.config(text="✅ Login thành công!", fg="green")
         for user in users:

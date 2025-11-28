@@ -14,3 +14,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_AVATAR = os.path.join(BASE_DIR, "..", "Images", "nv.png")
 DEFAULT_AVATAR = os.path.abspath(DEFAULT_AVATAR)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_ICON = os.path.join(BASE_DIR, "..", "Images", "icon_students_care.png")
+DEFAULT_ICON = os.path.abspath(DEFAULT_ICON)

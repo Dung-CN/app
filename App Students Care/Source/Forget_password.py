@@ -1,15 +1,25 @@
 from tkinter import *
-import json, os
 from Database import *
+from cryptography.fernet import Fernet
+import json, os
 import re
 
 # ================================ VARIABLE GLOBAL ================================ 
 error_pw_label = None
+# ================================ LOAD FERNET KEY ================================
+def load_key():
+    with open("secret.key", "rb") as f:
+        return f.read()
+
+fernet = Fernet(load_key())
+# =============================== HASH PASSWORD ===============================
+def hash_password(password):                 # Mã hóa
+    return fernet.encrypt(password.encode()).decode()
+
 # ================================ INFORMATION FORMATH =============================
 def check_password(password):
     is_valid = bool(re.fullmatch(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@#_]).+$', password))
     return is_valid
-
 # =============================== JSON PROCESSING ===============================
 def load_users():
     if os.path.exists(USERS_FILE):
@@ -91,7 +101,7 @@ def open_forget_password(pw_win):
             msg.config(text="⚠️ Mật khẩu không khớp", fg="red")
             return
         # Save new password
-        users[found_user]["password"] = new_pw
+        users[found_user]["password"] = hash_password(new_pw)
         save_users(users)
         msg.config(text="✅ Đổi mật khẩu thành công!", fg="green")
         new_pw_entry.delete(0, END)

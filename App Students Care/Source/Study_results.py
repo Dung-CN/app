@@ -2,7 +2,7 @@ from tkinter import *
 from Database import *
 from tkinter import ttk
 from PIL import Image, ImageTk
-from tkinter import filedialog, messagebox
+from tkinter import messagebox
 import json, os
 import re
 

@@ -1,11 +1,22 @@
 from tkinter import *
 from Database import *
+from cryptography.fernet import Fernet
 import json, os
 import re
 
 # ================================ VARIABLE GLOBAL ================================ 
 error_email_label = None
 error_pw_label = None
+# ================================ LOAD FERNET KEY ================================
+def load_key():
+    with open("secret.key", "rb") as f:
+        return f.read()
+
+fernet = Fernet(load_key())
+# =============================== HASH PASSWORD ===============================
+def hash_password(password):                 # Mã hóa
+    return fernet.encrypt(password.encode()).decode()
+
 # ================================ INFORMATION FORMATH ================================
 def check_email(email):
     is_valid = bool(re.fullmatch(r'\w+@\w+\.\w+$', email))
@@ -96,9 +107,13 @@ def open_signup(lg_win):
             Label(sgn, text="Tên người dùng đã tồn tại!", fg="red", relief='flat', bd=0).place(x=100, y=195)
             return
         elif password != confirm_password:
-            Label(sgn, text="Mật khẩu không khớp!", fg="red").place(x=100, y=195)
+                Label(sgn, text="Mật khẩu không khớp!", fg="red").place(x=100, y=195)
+                return
+        elif email in users:
+            Label(sgn, text="Tên người dùng đã tồn tại!", fg="red", relief='flat', bd=0).place(x=100, y=195)
             return
-        users[user_name] = {"email": email, "password": password}
+        hashed_password = hash_password(password)
+        users[user_name] = {"email": email, "password": hashed_password}
         save_users(users)
         Label(sgn, text="✅ Tạo tài khoản thành công", fg="green").place(x=100, y=195)
     create_acc = Button(sgn, text='Create Account', font=('Arial', 13, 'bold'), command=create_acc)
